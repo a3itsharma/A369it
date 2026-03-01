@@ -28,9 +28,6 @@ export const Logo: React.FC<{ className?: string }> = ({ className }) => {
           </radialGradient>
         </defs>
       </svg>
-      <span className="font-serif text-xl font-bold tracking-tighter text-stone-900">
-        TRIDENT<span className="text-orange-600">MARS</span>
-      </span>
     </motion.div>
   );
 };

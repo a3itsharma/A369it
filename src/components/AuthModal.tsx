@@ -42,20 +42,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-space-dark/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 dark:bg-space-dark/60 backdrop-blur-sm"
             onClick={onClose}
           />
           <motion.div 
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-md bg-stone-900 border border-white/10 rounded-2xl p-8 shadow-2xl"
+            className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl"
           >
             <button onClick={onClose} className="absolute top-4 right-4 text-tesla-silver/40 hover:text-white">
               <X size={20} />
             </button>
 
-            <h2 className="font-serif text-3xl font-bold text-white mb-2">
+            <h2 className="font-serif text-3xl font-bold text-matte-charcoal dark:text-white mb-2">
               {isLogin ? 'Welcome Back' : 'Join the Mission'}
             </h2>
             <p className="text-tesla-silver/60 text-sm mb-8">
@@ -71,7 +71,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     type="email" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:border-electric-blue outline-none transition-colors"
+                    className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 pl-10 pr-4 text-matte-charcoal dark:text-white focus:border-electric-blue outline-none transition-colors"
                     placeholder="explorer@mars.com"
                     required
                   />
@@ -86,7 +86,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     type="password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:border-electric-blue outline-none transition-colors"
+                    className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 pl-10 pr-4 text-matte-charcoal dark:text-white focus:border-electric-blue outline-none transition-colors"
                     placeholder="••••••••"
                     required
                   />

@@ -9,16 +9,16 @@ export const ChapterCard = ({ number, title, summary, passage }: { number: numbe
       whileInView={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5, borderColor: 'rgba(255, 255, 255, 0.1)' }}
       viewport={{ once: true }}
-      className="glass-card p-12 hover:bg-white/[0.03] transition-all duration-700 group cursor-default"
+      className="glass-card p-6 md:p-12 hover:bg-white/[0.03] transition-all duration-700 group cursor-default"
     >
-      <div className="flex items-center gap-8 mb-10">
-        <div className="w-16 h-16 rounded-3xl mars-gradient flex items-center justify-center text-white font-bold text-3xl shadow-2xl shimmer-foil shrink-0 opacity-80">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8 mb-10">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl mars-gradient flex items-center justify-center text-white font-bold text-2xl sm:text-3xl shadow-2xl shimmer-foil shrink-0 opacity-80">
           {number}
         </div>
-        <h3 className="font-serif text-4xl text-white group-hover:text-electric-blue transition-colors leading-tight">{title}</h3>
+        <h3 className="font-serif text-3xl sm:text-4xl text-matte-charcoal dark:text-white group-hover:text-electric-blue transition-colors leading-tight">{title}</h3>
       </div>
       <p className="text-tesla-silver/50 mb-10 leading-relaxed italic text-xl font-light">"{summary}"</p>
-      <div className="p-8 bg-black/40 rounded-2xl border border-white/[0.02]">
+      <div className="p-6 md:p-8 bg-black/5 dark:bg-black/40 rounded-2xl border border-black/[0.02] dark:border-white/[0.02]">
         <p className="text-base text-tesla-silver/40 font-serif leading-relaxed tracking-wide">
           <Sparkles size={16} className="inline mr-4 text-electric-blue/30" />
           {passage}

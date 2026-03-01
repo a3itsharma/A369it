@@ -1,6 +1,6 @@
 import React, { useRef, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Stars, Environment, Sphere, Torus } from '@react-three/drei';
+import { Float, Stars, Environment, Sphere, Torus, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 
 const MarsPlanetContent = () => {
@@ -59,19 +59,36 @@ export const MarsHeroScene: React.FC = () => {
 
 const TridentContent = () => {
   const ref = useRef<THREE.Group>(null);
+  const glowRef = useRef<THREE.Mesh>(null);
+  const arcsRef = useRef<THREE.Group>(null);
+
   useFrame((state) => {
     if (ref.current) {
-      ref.current.rotation.y += 0.01;
+      ref.current.rotation.y += 0.02; // Faster rotation
+    }
+    if (glowRef.current) {
+      const scale = 1 + Math.sin(state.clock.elapsedTime * 10) * 0.2 + Math.random() * 0.1;
+      glowRef.current.scale.set(scale, scale, scale);
+    }
+    if (arcsRef.current) {
+      arcsRef.current.rotation.z = state.clock.elapsedTime * 5;
+      arcsRef.current.rotation.x = state.clock.elapsedTime * 3;
+      arcsRef.current.children.forEach((child, i) => {
+        child.scale.x = 1 + Math.random() * 0.5;
+        child.scale.y = 1 + Math.random() * 0.5;
+        const material = (child as THREE.Mesh).material as THREE.Material;
+        material.opacity = 0.5 + Math.random() * 0.5;
+      });
     }
   });
 
   return (
-    <Float speed={2} rotationIntensity={1} floatIntensity={1}>
+    <Float speed={4} rotationIntensity={2} floatIntensity={2}>
       <group ref={ref}>
         {/* Trident Base */}
         <mesh position={[0, -1, 0]}>
           <cylinderGeometry args={[0.05, 0.05, 3, 32]} />
-          <meshStandardMaterial color="#C0C0C0" metalness={1} roughness={0.1} />
+          <meshStandardMaterial color="#C0C0C0" metalness={1} roughness={0.1} emissive="#000000" />
         </mesh>
         {/* Trident Prongs */}
         <mesh position={[0, 0.5, 0]}>
@@ -90,12 +107,66 @@ const TridentContent = () => {
           <cylinderGeometry args={[0.04, 0.04, 1.4, 32]} />
           <meshStandardMaterial color="#C0C0C0" metalness={1} roughness={0.1} />
         </mesh>
+        
+        {/* Electric Arcs */}
+        <group ref={arcsRef} position={[0, 1.5, 0]}>
+          {[...Array(6)].map((_, i) => (
+            <Torus key={i} args={[0.3 + Math.random() * 0.2, 0.01, 8, 32]} rotation={[Math.random() * Math.PI, Math.random() * Math.PI, 0]}>
+              <meshBasicMaterial color="#00D2FF" transparent opacity={0.8} />
+            </Torus>
+          ))}
+        </group>
+
         {/* Glow */}
-        <Sphere args={[0.1, 16, 16]} position={[0, 1.9, 0]}>
-          <meshBasicMaterial color="#6BB9C4" />
+        <Sphere ref={glowRef} args={[0.15, 32, 32]} position={[0, 1.9, 0]}>
+          <meshBasicMaterial color="#00D2FF" transparent opacity={0.9} />
         </Sphere>
+        <pointLight position={[0, 1.9, 0]} intensity={5} color="#00D2FF" distance={5} />
       </group>
     </Float>
+  );
+};
+
+const TridentParticles = () => {
+  const groupRef = useRef<THREE.Group>(null);
+  
+  useFrame((state) => {
+    if (groupRef.current) {
+      // React to pointer movements
+      const targetX = state.pointer.x * 1.5;
+      const targetY = state.pointer.y * 1.5;
+      
+      // Smoothly interpolate current position towards target pointer position
+      groupRef.current.position.x += (targetX - groupRef.current.position.x) * 0.05;
+      groupRef.current.position.y += (targetY - groupRef.current.position.y) * 0.05;
+      
+      // Add a slow rotation for ambient effect
+      groupRef.current.rotation.y += 0.002;
+      groupRef.current.rotation.x += 0.001;
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      <Sparkles 
+        count={150} 
+        scale={5} 
+        size={2} 
+        speed={0.4} 
+        opacity={0.6} 
+        color="#00D2FF" 
+        noise={0.2}
+      />
+      <Sparkles 
+        count={50} 
+        scale={7} 
+        size={4} 
+        speed={0.2} 
+        opacity={0.4} 
+        color="#6BB9C4" 
+        noise={0.5}
+      />
+    </group>
   );
 };
 
@@ -108,6 +179,7 @@ export const TeslaTridentScene: React.FC = () => {
           <spotLight position={[5, 5, 5]} angle={0.15} penumbra={1} intensity={2} color="#6BB9C4" />
           
           <TridentContent />
+          <TridentParticles />
           
           <Environment preset="studio" />
         </Suspense>

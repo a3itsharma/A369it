@@ -49,7 +49,7 @@ export const TeslaPuzzles: React.FC<PuzzleProps> = ({ onUnlock }) => {
   };
 
   return (
-    <div className="glass-card p-16 max-w-2xl mx-auto mt-12 relative overflow-hidden bg-matte-charcoal/60">
+    <div className="glass-card p-6 md:p-16 max-w-2xl mx-auto mt-12 relative overflow-hidden bg-white/60 dark:bg-matte-charcoal/60">
       <div className="absolute top-0 right-0 p-4 opacity-[0.03]">
         <Settings size={200} className="animate-spin-slow" />
       </div>
@@ -66,7 +66,7 @@ export const TeslaPuzzles: React.FC<PuzzleProps> = ({ onUnlock }) => {
             <div className="w-16 h-16 mars-gradient rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl">
               <Lock size={32} />
             </div>
-            <h3 className="font-serif text-5xl mb-8 text-white">Unlock Pro Features</h3>
+            <h3 className="font-serif text-3xl md:text-5xl mb-8 text-matte-charcoal dark:text-white">Unlock Pro Features</h3>
             <p className="text-tesla-silver/40 mb-12 leading-relaxed text-xl font-light">
               To access the advanced Martian transmissions (Cinematic Video & Full Gallery), 
               you must first calibrate the Tesla Tower by solving the fundamental puzzles 
@@ -74,7 +74,7 @@ export const TeslaPuzzles: React.FC<PuzzleProps> = ({ onUnlock }) => {
             </p>
             <button
               onClick={() => setShowIntro(false)}
-              className="px-12 py-5 bg-white/5 border border-white/10 text-tesla-silver/80 rounded-full font-bold hover:bg-white hover:text-space-dark transition-all shadow-2xl tracking-widest text-xs"
+              className="px-12 py-5 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-matte-charcoal dark:text-tesla-silver/80 rounded-full font-bold hover:bg-matte-charcoal hover:text-white dark:hover:bg-white dark:hover:text-space-dark transition-all shadow-2xl tracking-widest text-xs"
             >
               BEGIN CALIBRATION
             </button>
@@ -107,10 +107,10 @@ export const TeslaPuzzles: React.FC<PuzzleProps> = ({ onUnlock }) => {
                   "Polyphase currents create a rotating magnetic field. Align the secondary phase to exactly 90° to achieve perfect rotation."
                 </p>
 
-                <div className="relative h-40 bg-space-dark/50 rounded-xl border border-white/5 flex items-center justify-center overflow-hidden">
+                <div className="relative h-40 bg-black/5 dark:bg-space-dark/50 rounded-xl border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden">
                   {/* Visual representation of waves */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                    <div className="w-32 h-32 border-2 border-dashed border-white rounded-full"></div>
+                    <div className="w-32 h-32 border-2 border-dashed border-matte-charcoal dark:border-white rounded-full"></div>
                   </div>
                   
                   <motion.div 
@@ -153,12 +153,12 @@ export const TeslaPuzzles: React.FC<PuzzleProps> = ({ onUnlock }) => {
                     value={phase} 
                     onChange={(e) => setPhase(parseInt(e.target.value))}
                     disabled={puzzle1Solved}
-                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-electric-blue"
+                    className="w-full h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-electric-blue"
                   />
                   <button
                     onClick={checkPuzzle1}
                     disabled={puzzle1Solved}
-                    className="w-full py-3 bg-white/5 border border-white/10 rounded-xl font-bold hover:bg-white/10 transition-colors disabled:opacity-50"
+                    className="w-full py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl font-bold hover:bg-black/10 dark:hover:bg-white/10 transition-colors disabled:opacity-50"
                   >
                     CALIBRATE PHASE
                   </button>
@@ -182,7 +182,7 @@ export const TeslaPuzzles: React.FC<PuzzleProps> = ({ onUnlock }) => {
                   "The transmitter is a resonant transformer. Tune the frequency to find the Earth's stationary wave resonance."
                 </p>
 
-                <div className="relative h-40 bg-space-dark/50 rounded-xl border border-white/5 flex items-center justify-center overflow-hidden">
+                <div className="relative h-40 bg-black/5 dark:bg-space-dark/50 rounded-xl border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden">
                   <div className="flex items-end gap-1 h-20">
                     {[...Array(20)].map((_, i) => (
                       <motion.div
@@ -224,12 +224,12 @@ export const TeslaPuzzles: React.FC<PuzzleProps> = ({ onUnlock }) => {
                     value={frequency} 
                     onChange={(e) => setFrequency(parseInt(e.target.value))}
                     disabled={puzzle2Solved}
-                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-electric-blue"
+                    className="w-full h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-electric-blue"
                   />
                   <button
                     onClick={checkPuzzle2}
                     disabled={puzzle2Solved}
-                    className="w-full py-3 bg-white/5 border border-white/10 rounded-xl font-bold hover:bg-white/10 transition-colors disabled:opacity-50"
+                    className="w-full py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl font-bold hover:bg-black/10 dark:hover:bg-white/10 transition-colors disabled:opacity-50"
                   >
                     LOCK RESONANCE
                   </button>
@@ -253,7 +253,7 @@ export const TeslaPuzzles: React.FC<PuzzleProps> = ({ onUnlock }) => {
                   "The Art of Telautomatics: remote control via synchronized signals. Match the control frequency to guide the vessel."
                 </p>
 
-                <div className="relative h-40 bg-space-dark/50 rounded-xl border border-white/5 flex items-center justify-center overflow-hidden">
+                <div className="relative h-40 bg-black/5 dark:bg-space-dark/50 rounded-xl border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden">
                   <div className="relative w-full h-full flex items-center justify-center">
                     <motion.div
                       animate={{ 
@@ -317,12 +317,12 @@ export const TeslaPuzzles: React.FC<PuzzleProps> = ({ onUnlock }) => {
                     value={signal} 
                     onChange={(e) => setSignal(parseInt(e.target.value))}
                     disabled={puzzle3Solved}
-                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-electric-blue"
+                    className="w-full h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-electric-blue"
                   />
                   <button
                     onClick={checkPuzzle3}
                     disabled={puzzle3Solved}
-                    className="w-full py-3 bg-white/5 border border-white/10 rounded-xl font-bold hover:bg-white/10 transition-colors disabled:opacity-50"
+                    className="w-full py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl font-bold hover:bg-black/10 dark:hover:bg-white/10 transition-colors disabled:opacity-50"
                   >
                     SYNCHRONIZE SIGNAL
                   </button>

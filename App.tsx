@@ -8,7 +8,7 @@ import { AuthModal } from './src/components/AuthModal';
 import { auth } from './src/lib/firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { loadStripe } from '@stripe/stripe-js';
-import { ArrowDown, Menu, X, Zap, Star, Book, Info, Play, Loader2, Image as ImageIcon, Lock, User as UserIcon, LogOut, CreditCard } from 'lucide-react';
+import { ArrowDown, Menu, X, Zap, Star, Book, Info, Play, Loader2, Image as ImageIcon, Lock, User as UserIcon, LogOut, CreditCard, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GoogleGenAI } from "@google/genai";
 
@@ -32,6 +32,22 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('darkMode');
+      return saved ? JSON.parse(saved) : true; // Default to dark mode for this Martian theme
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
+  }, [isDarkMode]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -116,9 +132,11 @@ const App: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Video generation failed:", error);
-      if (error.message?.includes("Requested entity was not found")) {
+      const errorStr = typeof error === 'object' ? JSON.stringify(error) : String(error);
+      if (errorStr.includes("Requested entity was not found") || errorStr.includes("PERMISSION_DENIED") || errorStr.includes("403")) {
         setHasApiKey(false);
-        alert("API key session expired. Please select your key again.");
+        alert("API key session expired or lacks permission. Please select a valid paid API key and try again.");
+        await handleSelectKey();
       } else {
         alert("The Martian storm was too strong. Please try again later.");
       }
@@ -164,13 +182,13 @@ const App: React.FC = () => {
     {
       number: 2,
       title: "The Helmet That Hummed",
-      summary: "Tesla’s helmet is revealed to be a listening, learning device. Mira learns to “hear” the planet’s currents.",
+      summary: "Tesla’s helmet is revealed to be a listening and learning device. Mira learns to hear the planet’s currents.",
       passage: "Tesla taught Mira to feel the ground’s heartbeat: a slow, patient thrum under the rocks."
     },
     {
       number: 3,
       title: "Drones in the Dust",
-      summary: "Wobbling drones lead Mira and Tesla to an old, forgotten Tesla coil. They repair it, learning teamwork and basic circuitry.",
+      summary: "Wobbling drones lead Mira and Tesla to an old forgotten Tesla coil. They repair it, learning teamwork and basic circuitry.",
       passage: "Pip the drone wobbled above the cracked ground, its sensors chirping as Mira tightened the final copper wire."
     },
     {
@@ -182,7 +200,7 @@ const App: React.FC = () => {
     {
       number: 5,
       title: "Wings of the Red Wind",
-      summary: "Mira meets Lio, a flying humanoid, who teaches her to navigate the Martian thermal currents using a specialized jetpack.",
+      summary: "Mira meets Lio, a flying humanoid who teaches her to navigate the Martian thermal currents using a specialized jetpack.",
       passage: "The wind didn't just push; it invited. Lio banked left, a streak of silver against the orange sky, and Mira followed, her heart racing as fast as her turbines."
     },
     {
@@ -194,7 +212,7 @@ const App: React.FC = () => {
     {
       number: 7,
       title: "The Shield of Sapphire",
-      summary: "A massive Martian dust storm threatens the City of Glass. Mira and Tesla must use the Tower to create an electromagnetic shield.",
+      summary: "A massive Martian dust storm threatens the City of Glass. Mira and Tesla must use the tower to create an electromagnetic shield.",
       passage: "The sky turned the color of a bruised plum. Tesla adjusted the final dial, and a web of sapphire light unfurled above the domes, catching the first strike of the storm."
     }
   ];
@@ -215,7 +233,7 @@ const App: React.FC = () => {
     <div className="min-h-screen selection:bg-electric-blue selection:text-space-dark">
       
       {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-space-dark/80 backdrop-blur-xl border-b border-white/10 py-4' : 'bg-transparent py-8'}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-white/80 dark:bg-space-dark/80 backdrop-blur-xl border-b border-black/5 dark:border-white/10 py-4' : 'bg-transparent py-8'}`}>
         <div className="container mx-auto px-6 flex justify-between items-center">
           <Logo className="cursor-pointer" />
           
@@ -224,6 +242,16 @@ const App: React.FC = () => {
             <a href="#gallery" onClick={scrollToSection('gallery')} className="hover:text-electric-blue transition-colors">Illustrations</a>
             <a href="#experiment" onClick={scrollToSection('experiment')} className="hover:text-electric-blue transition-colors">The Experiment</a>
             
+            <div className="h-4 w-px bg-white/10 mx-2"></div>
+
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-matte-charcoal dark:text-tesla-silver"
+              title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
             <div className="h-4 w-px bg-white/10 mx-2"></div>
 
             {user ? (
@@ -269,44 +297,54 @@ const App: React.FC = () => {
             initial={{ opacity: 0, x: '100%' }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
-            className="fixed inset-0 z-40 bg-space-dark flex flex-col items-center justify-center gap-8 text-2xl font-serif"
+            className="fixed inset-0 z-40 bg-white dark:bg-space-dark flex flex-col items-center justify-center gap-8 text-2xl font-serif"
           >
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="absolute top-8 right-8 p-3 rounded-full bg-black/5 dark:bg-white/10 text-matte-charcoal dark:text-tesla-silver"
+            >
+              {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
+            </button>
             <a href="#story" onClick={scrollToSection('story')} className="hover:text-electric-blue">The Journey</a>
             <a href="#gallery" onClick={scrollToSection('gallery')} className="hover:text-electric-blue">Illustrations</a>
             <a href="#experiment" onClick={scrollToSection('experiment')} className="hover:text-electric-blue">The Experiment</a>
-            <a href="#brief" onClick={scrollToSection('brief')} className="hover:text-electric-blue">Brief</a>
-            <button className="px-8 py-3 bg-electric-blue text-space-dark rounded-full font-bold">Download PDF</button>
+            <a href="#trident" onClick={scrollToSection('trident')} className="hover:text-electric-blue">The Trident</a>
+            <button className="px-8 py-3 bg-electric-blue text-space-dark rounded-full font-bold text-lg">Download PDF</button>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Hero Section */}
       <header className="relative h-screen flex items-center justify-center overflow-hidden">
-        <MarsHeroScene />
-        <div className="absolute inset-0 bg-gradient-to-b from-space-dark/20 via-transparent to-space-dark"></div>
+        {generatedVideoUrl ? (
+          <video 
+            src={generatedVideoUrl} 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover z-0"
+          />
+        ) : (
+          <MarsHeroScene />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/20 dark:from-space-dark/20 via-transparent to-white dark:to-space-dark z-0"></div>
 
         <div className="relative z-10 container mx-auto px-6 text-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-block mb-6 px-4 py-1 border border-electric-blue/30 text-electric-blue text-[10px] tracking-[0.4em] uppercase font-black rounded-full backdrop-blur-md bg-white/5"
-          >
-            A Sci-Fi Adventure for Ages 8-12
-          </motion.div>
           <motion.h1 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="font-serif text-6xl md:text-8xl lg:text-9xl font-bold mb-8 leading-none"
+            className="font-cursive text-7xl md:text-8xl lg:text-9xl font-bold mb-8 leading-none"
           >
             The Tesla <br/>
-            <span className="shimmer-text italic font-normal">Trident of Mars</span>
+            <span className="shimmer-text font-normal">Trident of Mars</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="max-w-2xl mx-auto text-lg md:text-xl text-tesla-silver/70 font-light leading-relaxed mb-12"
+            className="max-w-2xl mx-auto text-lg md:text-xl text-matte-charcoal/70 dark:text-tesla-silver/70 font-light leading-relaxed mb-12"
           >
             Mira and Tesla embark on a journey across the red plains to unlock the secrets of the City of Glass and the ancient Tower of Light.
           </motion.p>
@@ -315,11 +353,33 @@ const App: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="flex justify-center"
+            className="flex flex-col items-center justify-center gap-8"
           >
-             <a href="#story" onClick={scrollToSection('story')} className="group flex flex-col items-center gap-4 text-[10px] font-black tracking-[0.3em] text-tesla-silver/40 hover:text-electric-blue transition-colors">
+             {!generatedVideoUrl && (
+               isVideoGenerating ? (
+                 <div className="flex flex-col items-center gap-3">
+                   <div className="px-8 py-4 bg-electric-blue/50 text-space-dark rounded-full font-bold flex items-center gap-3 cursor-not-allowed">
+                     <Loader2 className="animate-spin" size={20} />
+                     <span>Generating Video...</span>
+                   </div>
+                   <span className="text-xs font-bold tracking-widest text-electric-blue uppercase animate-pulse">
+                     {generationStatus}
+                   </span>
+                 </div>
+               ) : (
+                 <button 
+                   onClick={generateCinematicVideo}
+                   className="px-8 py-4 bg-electric-blue text-space-dark rounded-full font-bold hover:bg-white transition-all shadow-xl flex items-center gap-3"
+                 >
+                   <Play size={20} />
+                   <span>Generate Cinematic Intro</span>
+                 </button>
+               )
+             )}
+
+             <a href="#story" onClick={scrollToSection('story')} className="group flex flex-col items-center gap-4 text-[10px] font-black tracking-[0.3em] text-matte-charcoal/40 dark:text-tesla-silver/40 hover:text-electric-blue dark:hover:text-electric-blue transition-colors mt-4">
                 <span>BEGIN JOURNEY</span>
-                <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:border-electric-blue transition-colors">
+                <div className="w-10 h-10 rounded-full border border-black/10 dark:border-white/10 flex items-center justify-center group-hover:border-electric-blue dark:group-hover:border-electric-blue transition-colors">
                   <ArrowDown size={16} className="animate-bounce" />
                 </div>
              </a>
@@ -329,14 +389,14 @@ const App: React.FC = () => {
 
       <main className="relative z-10">
         {/* Story Section */}
-        <section id="story" className="py-32 container mx-auto px-6">
+        <section id="story" className="py-12 md:py-20 container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 items-start">
             <div className="lg:col-span-4 sticky top-32">
               <div className="text-electric-blue text-xs font-black tracking-[0.3em] uppercase mb-4">THE MANUSCRIPT</div>
               <h2 className="font-serif text-5xl mb-8 leading-tight shimmer-text">Expanded <br/>Chapters</h2>
               <div className="w-20 h-1 mars-gradient mb-8 shimmer-foil"></div>
               <p className="text-tesla-silver/60 leading-relaxed text-lg">
-                Deepening character arcs for Mira and Tesla, adding vivid sensory detail, and introducing age-appropriate scientific curiosity.
+                Deepening character arcs for Mira and Tesla, adding vivid sensory detail and introducing scientific curiosity.
               </p>
             </div>
             <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -350,7 +410,7 @@ const App: React.FC = () => {
         {/* Gallery Section */}
         <div className="relative">
           {!isProUnlocked && (
-            <div className="absolute inset-0 z-20 bg-space-dark/60 backdrop-blur-md flex items-center justify-center p-6">
+            <div className="absolute inset-0 z-20 bg-white/60 dark:bg-space-dark/60 backdrop-blur-md flex items-center justify-center p-6">
               <TeslaPuzzles onUnlock={() => setIsProUnlocked(true)} />
             </div>
           )}
@@ -358,7 +418,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Experiment Section */}
-        <section id="experiment" className="py-32 bg-white/5 border-y border-white/5">
+        <section id="experiment" className="py-12 md:py-20 bg-black/5 dark:bg-white/5 border-y border-black/5 dark:border-white/5">
           <div className="container mx-auto px-6">
             <div className="max-w-4xl mx-auto text-center mb-20">
               <div className="inline-flex items-center gap-2 px-4 py-1 bg-electric-blue/10 text-electric-blue text-[10px] font-black tracking-[0.3em] uppercase rounded-full mb-6 border border-electric-blue/20">
@@ -419,62 +479,30 @@ const App: React.FC = () => {
                     "The ribbon did not scream or burn; it sang. It threaded through the Tesla Tower’s coils and leapt into the sky like a ladder of lanterns."
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="glass-card p-6 text-center">
-                    <div className="text-3xl font-serif text-electric-blue mb-2">300 DPI</div>
-                    <div className="text-[10px] uppercase tracking-widest text-tesla-silver/40">Print Ready</div>
-                  </div>
-                  <div className="glass-card p-6 text-center">
-                    <div className="text-3xl font-serif text-electric-blue mb-2">CMYK</div>
-                    <div className="text-[10px] uppercase tracking-widest text-tesla-silver/40">Color Mode</div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Production Brief */}
-        <section id="brief" className="py-32 container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <div className="order-2 lg:order-1 h-[600px] glass-card overflow-hidden relative">
-              <TeslaTridentScene />
-              <div className="absolute bottom-8 left-8 right-8 p-6 bg-space-dark/80 backdrop-blur-md rounded-xl border border-white/10">
-                <div className="text-[10px] font-black tracking-[0.3em] text-electric-blue mb-2 uppercase">Visual Direction</div>
-                <div className="text-sm text-tesla-silver/70">Cartoon-realistic, high contrast, kid-friendly proportions with shimmer/glow layers.</div>
-              </div>
-            </div>
-            <div className="order-1 lg:order-2">
-              <div className="text-electric-blue text-xs font-black tracking-[0.3em] uppercase mb-4">PRODUCTION SPECS</div>
-              <h2 className="font-serif text-5xl mb-8 shimmer-text">Crafting the <br/>Experience</h2>
-              <div className="space-y-6">
-                {[
-                  { icon: <Info size={20} />, title: "Page Specs", desc: "A4 (210 × 297 mm) with 3 mm bleed; US Letter variant included." },
-                  { icon: <Star size={20} />, title: "Typography", desc: "Merriweather 14–16 pt for body; playful bold display fonts for chapters." },
-                  { icon: <Zap size={20} />, title: "Shimmer Effects", desc: "Simulated foil with metallic gradients and specular highlights." },
-                  { icon: <Book size={20} />, title: "Accessibility", desc: "Selectable text, alt text for images, and high contrast color choices." }
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-6 group">
-                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-electric-blue group-hover:bg-electric-blue group-hover:text-space-dark transition-all">
-                      {item.icon}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-lg mb-1">{item.title}</h4>
-                      <p className="text-tesla-silver/50 text-sm leading-relaxed">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+        {/* Trident Showcase */}
+        <section id="trident" className="py-12 md:py-20 container mx-auto px-6">
+          <div className="max-w-4xl mx-auto text-center mb-12">
+            <h2 className="font-serif text-5xl mb-4 shimmer-text">The Trident of Mars</h2>
+            <p className="text-tesla-silver/60 leading-relaxed text-lg">
+              A powerful artifact pulsing with raw Martian energy.
+            </p>
+          </div>
+          <div className="h-[600px] glass-card overflow-hidden relative w-full max-w-5xl mx-auto">
+            <TeslaTridentScene />
           </div>
         </section>
 
         {/* Activity Section */}
-        <section className="py-32 mars-gradient">
+        <section className="py-12 md:py-20 mars-gradient">
           <div className="container mx-auto px-6 text-center">
             <h2 className="font-serif text-5xl mb-8 text-white">Ready for Adventure?</h2>
             <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
-              The back matter includes activity pages, teacher guides, and a glossary to keep the Martian curiosity growing.
+              The back matter includes activity pages, teacher guides and a glossary to keep the Martian curiosity growing.
             </p>
             <div className="flex flex-wrap justify-center gap-6">
               <button className="px-10 py-4 bg-space-dark text-white rounded-full font-bold hover:bg-white hover:text-space-dark transition-all shadow-2xl">
@@ -488,7 +516,7 @@ const App: React.FC = () => {
         </section>
       </main>
 
-      <footer className="bg-space-dark border-t border-white/5 py-20">
+      <footer className="bg-white dark:bg-space-dark border-t border-black/5 dark:border-white/5 py-12">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-20">
             <div className="max-w-sm">
@@ -496,26 +524,26 @@ const App: React.FC = () => {
                 <div className="w-8 h-8 mars-gradient rounded-lg flex items-center justify-center text-white">
                   <Zap size={16} />
                 </div>
-                <span className="font-serif font-bold text-xl tracking-wider text-tesla-silver">
+                <span className="font-serif font-bold text-xl tracking-wider text-matte-charcoal dark:text-tesla-silver">
                   TESLA <span className="text-electric-blue">TRIDENT</span>
                 </span>
               </div>
               <p className="text-tesla-silver/40 text-sm leading-relaxed">
-                A children’s sci-fi novel reimagined as a high-definition, colourful interactive experience.
+                A sci-fi novel reimagined as a high-definition colorful interactive experience.
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-12">
               <div>
-                <h5 className="text-white font-bold text-xs tracking-widest uppercase mb-6">Story</h5>
+                <h5 className="text-matte-charcoal dark:text-white font-bold text-xs tracking-widest uppercase mb-6">Story</h5>
                 <ul className="space-y-4 text-sm text-tesla-silver/40">
                   <li><a href="#story" onClick={scrollToSection('story')} className="hover:text-electric-blue">The Journey</a></li>
                   <li><a href="#gallery" onClick={scrollToSection('gallery')} className="hover:text-electric-blue">Illustrations</a></li>
                   <li><a href="#experiment" onClick={scrollToSection('experiment')} className="hover:text-electric-blue">The Experiment</a></li>
-                  <li><a href="#brief" onClick={scrollToSection('brief')} className="hover:text-electric-blue">The Tower</a></li>
+                  <li><a href="#trident" onClick={scrollToSection('trident')} className="hover:text-electric-blue">The Trident</a></li>
                 </ul>
               </div>
               <div>
-                <h5 className="text-white font-bold text-xs tracking-widest uppercase mb-6">Resources</h5>
+                <h5 className="text-matte-charcoal dark:text-white font-bold text-xs tracking-widest uppercase mb-6">Resources</h5>
                 <ul className="space-y-4 text-sm text-tesla-silver/40">
                   <li><a href="#" className="hover:text-electric-blue">Teacher Guide</a></li>
                   <li><a href="#" className="hover:text-electric-blue">Activities</a></li>
@@ -523,7 +551,7 @@ const App: React.FC = () => {
                 </ul>
               </div>
               <div>
-                <h5 className="text-white font-bold text-xs tracking-widest uppercase mb-6">Legal</h5>
+                <h5 className="text-matte-charcoal dark:text-white font-bold text-xs tracking-widest uppercase mb-6">Legal</h5>
                 <ul className="space-y-4 text-sm text-tesla-silver/40">
                   <li><a href="#" className="hover:text-electric-blue">Privacy</a></li>
                   <li><a href="#" className="hover:text-electric-blue">Terms</a></li>
@@ -531,7 +559,7 @@ const App: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-12 border-t border-white/5 text-[10px] font-black tracking-[0.2em] text-tesla-silver/20 uppercase">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-12 border-t border-black/5 dark:border-white/5 text-[10px] font-black tracking-[0.2em] text-matte-charcoal/20 dark:text-tesla-silver/20 uppercase">
             <div>© 2026 Amit. All Rights Reserved.</div>
             <div className="flex gap-8">
               <span>Designed with AI</span>
